@@ -43,9 +43,11 @@ app.get('/test', function(req, res){
   res.end('Hello World!');
 });
 
-app.get('/ht:term?offset=:offsetNum', function(req, res) {
+app.get('/:term', function(req, res) {
   console.log(req.params.term);
-  console.log(req.params.offsetNum);
+  console.log(req.query.offset);
+  var d=new Date();
+  res.send('Term is: '+req.params.term+';\noffset is: '+req.query.offset+'\nTime is: ' Date.now())
 })
         
 /*
