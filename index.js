@@ -46,7 +46,6 @@ app.get('/test', function(req, res){
 
 app.get('/history', function(req, res) {
   var mongoUrl = 'mongodb://localhost:27017/data';
-  var historyArr=[];
   mongo.connect(mongoUrl, function (err, db) {
     if (err) {
       console.log('Unable to connect to the mongoDB server. Error:', err);
@@ -56,11 +55,11 @@ app.get('/history', function(req, res) {
       var col=myDB.collection('searches');
       var query=col.find().toArray(function (err, documents){
         if(err){console.log(err);}
-        //console.log(documents);
+        console.log(documents);
+        res.send(documents);
       })
-      console.log(query);
       db.close();
-      res.send(query);
+      //res.send(query);
     }
   })
 })
