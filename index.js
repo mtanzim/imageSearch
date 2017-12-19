@@ -44,6 +44,28 @@ app.get('/test', function(req, res){
   res.end('Hello World!');
 });
 
+app.get('/history', function(req, res) {
+  var mongoUrl = 'mongodb://localhost:27017/data';
+  var historyArr=[];
+  mongo.connect(mongoUrl, function (err, db) {
+    if (err) {
+      console.log('Unable to connect to the mongoDB server. Error:', err);
+    } else {
+      console.log('Connection established to', mongoUrl);
+      var myDB=db.db('data');
+      var col=myDB.collection('searches');
+      var query=col.find().toArray(function (err, documents){
+        if(err){console.log(err);}
+        //console.log(documents);
+      })
+      console.log(query);
+      db.close();
+      res.send(query);
+    }
+  })
+})
+  
+
 app.get('/:term', function(req, res) {
   console.log(req.params.term);
   console.log(req.query.offset);
