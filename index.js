@@ -47,7 +47,7 @@ app.get('/:term', function(req, res) {
   console.log(req.params.term);
   console.log(req.query.offset);
   var d=new Date;
-  res.send('Term is: '+req.params.term+';Offset is: '+req.query.offset+'Time is: '+ d.toLocaleString());
+  res.send('Term is: '+req.params.term+';Offset is: '+req.query.offset+';Time is: '+ d.toLocaleString());
 })
         
 /*
