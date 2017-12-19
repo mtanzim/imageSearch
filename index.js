@@ -48,6 +48,25 @@ app.get('/:term', function(req, res) {
   console.log(req.params.term);
   console.log(req.query.offset);
   var d=new Date;
+  var mongoUrl = 'mongodb://localhost:27017/data';
+  mongo.connect(mongoUrl, function (err, db) {
+  if (err) {
+    console.log('Unable to connect to the mongoDB server. Error:', err);
+  } else {
+    console.log('Connection established to', mongoUrl);
+    var myDB=db.db('data');
+    var col=myDB.collection('searches');
+    var query=col.find().toArray(function (err, documents){
+      if(err){console.log(err);}
+      console.log(documents);
+    })
+    // do some work here with the database.
+
+    //Close connection
+    db.close();
+  }
+});
+  
   res.send('Term is: '+req.params.term+';Offset is: '+req.query.offset+';Time is: '+ d.toLocaleString());
 })
         
