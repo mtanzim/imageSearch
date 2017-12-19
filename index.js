@@ -6,7 +6,7 @@
 
 var fs = require('fs');
 var express = require('express');
-var googl = require('goo.gl');
+/*var googl = require('goo.gl');*/
 
 var app = express();
 
@@ -43,7 +43,11 @@ app.get('/test', function(req, res){
   res.end('Hello World!');
 });
 
-
+app.get('/ht:term?offset=:offsetNum', function(req, res) {
+  console.log(req.params.term);
+  console.log(req.params.offsetNum);
+})
+        
 /*
 app.get('/https://:origUrl', function(req, res) {
   console.log(req.params.origUrl);
