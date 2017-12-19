@@ -56,6 +56,13 @@ app.get('/:term', function(req, res) {
     console.log('Connection established to', mongoUrl);
     var myDB=db.db('data');
     var col=myDB.collection('searches');
+    col.insert({
+      term:req.params.term,
+      time: d.toLocaleString()
+    }, function (err,data){
+      if (err){console.log(err);}
+      console.log(JSON.stringify(data));
+    })
     var query=col.find().toArray(function (err, documents){
       if(err){console.log(err);}
       console.log(documents);
