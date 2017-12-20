@@ -53,7 +53,7 @@ app.get('/history', function(req, res) {
       console.log('Connection established to', mongoUrl);
       var myDB=db.db('data');
       var col=myDB.collection('searches');
-      var query=col.find().sort({time:-1}).toArray(function (err, documents){
+      var query=col.find().sort({time:-1}).limit(10).toArray(function (err, documents){
         if(err){console.log(err);}
         console.log(documents);
         res.send(documents);
