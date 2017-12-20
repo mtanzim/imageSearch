@@ -1,1 +1,1 @@
-# Backend Challenges boilerplate - package.json
+FCC Back end Challenge 4: Image Search Microservice

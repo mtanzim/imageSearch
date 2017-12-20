@@ -53,7 +53,7 @@ app.get('/history', function(req, res) {
       console.log('Connection established to', mongoUrl);
       var myDB=db.db('data');
       var col=myDB.collection('searches');
-      var query=col.find().toArray(function (err, documents){
+      var query=col.find().sort({time:-1}).toArray(function (err, documents){
         if(err){console.log(err);}
         console.log(documents);
         res.send(documents);
@@ -64,6 +64,11 @@ app.get('/history', function(req, res) {
   })
 })
   
+
+app.get('/favicon.ico', function(req, res) {
+  res.send('Ignore this!');
+})
+        
 
 app.get('/:term', function(req, res) {
   console.log(req.params.term);
