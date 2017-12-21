@@ -7,8 +7,10 @@
 var fs = require('fs');
 var express = require('express');
 var mongo=require('mongodb').MongoClient;
-/*var googl = require('goo.gl');*/
-
+var googleSearch=require('google-search');
+//var googleImages = require('google-images');
+//var gSearchAPIKey=process.env.GSEARCH_API;
+//var cseID=process.env.CSE_ID;
 var app = express();
 
 if (!process.env.DISABLE_XORIGIN) {
@@ -73,6 +75,21 @@ app.get('/favicon.ico', function(req, res) {
 app.get('/:term', function(req, res) {
   console.log(req.params.term);
   console.log(req.query.offset);
+  var google= new googleSearch({
+    key: process.env.API_KEY,
+    cx: process.env.CSE_ID
+  });
+  google.build({
+    q: req.params.term,
+    //start: 1,
+    fileType: "image",
+    //gl: "tr", //geolocation, 
+    //lr: "lang_tr",
+    num: 10, // Number of search results to return between 1 and 10, inclusive 
+    //siteSearch: "http://kitaplar.ankara.edu.tr/" // Restricts results to URLs from a specified site 
+  }, function(error, response) {
+    console.log(response);
+  });
   var d=new Date;
   var mongoUrl = 'mongodb://localhost:27017/data';
   mongo.connect(mongoUrl, function (err, db) {
@@ -89,12 +106,12 @@ app.get('/:term', function(req, res) {
       if (err){console.log(err);}
       console.log(JSON.stringify(data));
     })
+    /*
     var query=col.find().toArray(function (err, documents){
       if(err){console.log(err);}
       console.log(documents);
     })
-    // do some work here with the database.
-
+    */
     //Close connection
     db.close();
   }
@@ -103,25 +120,6 @@ app.get('/:term', function(req, res) {
   res.send('Term is: '+req.params.term+';Offset is: '+req.query.offset+';Time is: '+ d.toLocaleString());
 })
         
-/*
-app.get('/https://:origUrl', function(req, res) {
-  console.log(req.params.origUrl);
-  //let shortUrl='';
-  //let urlObj={'url':req.params.origUrl, 'short-url':shortenUrl(req.params.origUrl)};
-  googl.setKey('AIzaSyAxgUwTeQNjkpykpftRxW189BAcT3ZGdpw');
-  var shortGoogUrl='';
-  // Shorten a long url and output the result 
-  googl.shorten(req.params.origUrl)
-    .then(function (shortUrl) {
-        console.log(shortUrl);
-        res.type('txt').send(JSON.stringify({'url':req.params.origUrl, 'short-url':shortUrl}));
-    })
-    .catch(function (err) {
-        console.error(err.message);
-    });
-  
-})
-*/
 
 // Respond not found to all the wrong routes
 app.use(function(req, res, next){
