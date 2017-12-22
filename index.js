@@ -58,7 +58,7 @@ app.get('/history', function(req, res) {
       var query=col.find().sort({time:-1}).limit(10).toArray(function (err, documents){
         if(err){console.log(err);}
         console.log(documents);
-        res.send(documents);
+        res.type('txt').send(documents);
       })
       db.close();
       //res.send(query);
@@ -68,18 +68,21 @@ app.get('/history', function(req, res) {
   
 
 app.get('/favicon.ico', function(req, res) {
-  res.send('Ignore this!');
+  res.type('txt').send('Ignore this!');
 })
         
 
 app.get('/:term', function(req, res) {
   console.log(req.params.term);
   console.log(req.query.offset);
+  console.log(parseInt(req.query.offset));
+  var offsetInt=10;
   
-  //if (!(req.query.offset===parseInt(req.query.offset))){
-    //res.end('Please provide an integer as the offset!');
-    //next();
-  //} else {
+  if (req.query.offset!=parseInt(req.query.offset)){
+    console.log('Not an integer. Using default offset value of 10.');
+  } else {
+    offsetInt=Math.min(req.query.offset,10);
+  }
     var google= new googleSearch({
       key: process.env.API_KEY,
       cx: process.env.CSE_ID
@@ -91,10 +94,10 @@ app.get('/:term', function(req, res) {
       //fileType: "image",
       //gl: "tr", //geolocation, 
       //lr: "lang_tr",
-      num: Math.min(req.query.offset,10), // Number of search results to return between 1 and 10, inclusive 
+      num: offsetInt, // Number of search results to return between 1 and 10, inclusive 
       //siteSearch: "http://kitaplar.ankara.edu.tr/" // Restricts results to URLs from a specified site 
     }, function(error, response) {
-      console.log(response);
+      //console.log(response);
       var responseBuffer=[];
       response.items.forEach(function(item){
         //console.log(item.snippet);
@@ -107,7 +110,7 @@ app.get('/:term', function(req, res) {
         }
         responseBuffer.push(tempObj);
       });
-      res.send(JSON.stringify(responseBuffer));
+      res.type('txt').send(JSON.stringify(responseBuffer));
     });
     var d=new Date;
     var mongoUrl = 'mongodb://localhost:27017/data';
