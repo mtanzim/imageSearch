@@ -75,49 +75,69 @@ app.get('/favicon.ico', function(req, res) {
 app.get('/:term', function(req, res) {
   console.log(req.params.term);
   console.log(req.query.offset);
-  var google= new googleSearch({
-    key: process.env.API_KEY,
-    cx: process.env.CSE_ID
-  });
-  google.build({
-    q: req.params.term,
-    //start: 1,
-    fileType: "image",
-    //gl: "tr", //geolocation, 
-    //lr: "lang_tr",
-    num: 10, // Number of search results to return between 1 and 10, inclusive 
-    //siteSearch: "http://kitaplar.ankara.edu.tr/" // Restricts results to URLs from a specified site 
-  }, function(error, response) {
-    console.log(response);
-  });
-  var d=new Date;
-  var mongoUrl = 'mongodb://localhost:27017/data';
-  mongo.connect(mongoUrl, function (err, db) {
-  if (err) {
-    console.log('Unable to connect to the mongoDB server. Error:', err);
-  } else {
-    console.log('Connection established to', mongoUrl);
-    var myDB=db.db('data');
-    var col=myDB.collection('searches');
-    col.insert({
-      term:req.params.term,
-      time: d.toLocaleString()
-    }, function (err,data){
-      if (err){console.log(err);}
-      console.log(JSON.stringify(data));
-    })
-    /*
-    var query=col.find().toArray(function (err, documents){
-      if(err){console.log(err);}
-      console.log(documents);
-    })
-    */
-    //Close connection
-    db.close();
-  }
-});
   
-  res.send('Term is: '+req.params.term+';Offset is: '+req.query.offset+';Time is: '+ d.toLocaleString());
+  //if (!(req.query.offset===parseInt(req.query.offset))){
+    //res.end('Please provide an integer as the offset!');
+    //next();
+  //} else {
+    var google= new googleSearch({
+      key: process.env.API_KEY,
+      cx: process.env.CSE_ID
+    });
+    google.build({
+      q: req.params.term,
+      searchType:'image',
+      //start: 1,
+      //fileType: "image",
+      //gl: "tr", //geolocation, 
+      //lr: "lang_tr",
+      num: Math.min(req.query.offset,10), // Number of search results to return between 1 and 10, inclusive 
+      //siteSearch: "http://kitaplar.ankara.edu.tr/" // Restricts results to URLs from a specified site 
+    }, function(error, response) {
+      console.log(response);
+      var responseBuffer=[];
+      response.items.forEach(function(item){
+        //console.log(item.snippet);
+        let tempObj={};
+        tempObj={
+          title:item.title,
+          snippet:item.snippet,
+          link:item.link,
+          //url:item.formattedUrl
+        }
+        responseBuffer.push(tempObj);
+      });
+      res.send(JSON.stringify(responseBuffer));
+    });
+    var d=new Date;
+    var mongoUrl = 'mongodb://localhost:27017/data';
+    mongo.connect(mongoUrl, function (err, db) {
+      if (err) {
+        console.log('Unable to connect to the mongoDB server. Error:', err);
+      } else {
+        console.log('Connection established to', mongoUrl);
+        var myDB=db.db('data');
+        var col=myDB.collection('searches');
+        col.insert({
+          term:req.params.term,
+          time: d.toLocaleString()
+        }, function (err,data){
+          if (err){console.log(err);}
+          console.log(JSON.stringify(data));
+        })
+        /*
+        var query=col.find().toArray(function (err, documents){
+          if(err){console.log(err);}
+          console.log(documents);
+        })
+        */
+        //Close connection
+        db.close();
+      }
+    });
+
+    //res.send('Term is: '+req.params.term+';Offset is: '+req.query.offset+';Time is: '+ d.toLocaleString());
+  //}
 })
         
 
